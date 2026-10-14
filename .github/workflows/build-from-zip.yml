@@ -1,1 +1,36 @@
+name: Build MY WORLD APK
 
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Extract project
+        run: unzip -q MY_WORLD_Project.zip -d extracted
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build APK
+        run: gradle -p extracted/myworld assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MY-WORLD-APK
+          path: extracted/myworld/app/build/outputs/apk/debug/app-debug.apk
